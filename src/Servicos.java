@@ -1,3 +1,4 @@
+package src;
 import java.util.List;
 
 public class Servicos {
@@ -5,6 +6,6 @@ public class Servicos {
 
 
     public static void newCarro(){
-        Carro carro = new Carro(null, null, null, null, null, 0, null)
+        Carro carro = new Carro(null, null, null, null, null, 0, null);
     }
 }
