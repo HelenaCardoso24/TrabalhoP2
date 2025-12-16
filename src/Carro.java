@@ -1,5 +1,3 @@
-import java.util.List;
-
 public class Carro {
 
     private String matricula;
@@ -20,17 +18,6 @@ public class Carro {
         this.combustivel = combustivel;
         this.quilometros = quilometros;
         this.historico = historico;
-    }
-
-    public Carro(String matricula, String numeroChassi, String dono, String marca, String modelo, int ano, String combustivel){
-        this.matricula=matricula;
-        this.dono = dono;
-        this.marca = marca;
-        this.modelo = modelo;
-        this.ano = ano;
-        this.combustivel = combustivel;
-        this.quilometros = 0;
-        this.historico = "";
     }
 
     public String getMatricula() {
