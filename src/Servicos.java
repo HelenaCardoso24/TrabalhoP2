@@ -33,6 +33,30 @@ public class Servicos {
             System.out.println("Serviço não encontrado: " + servico);
         }
     }
+    public static double calcularTotal(Carro carro) {
+        double total = 0;
+        String[] linhas = carro.getHistorico().split("\n");
+
+        for (String linha : linhas) {
+            if (linha.contains("€")) {
+                String valor = linha.substring(linha.indexOf("-") + 1)
+                        .replace("€", "")
+                        .trim();
+                total += Double.parseDouble(valor);
+            }
+        }
+        return total;
+    }
+
+    // 🧾 Fatura simples
+    public static void imprimirFatura(Carro carro) {
+        System.out.println("----- FATURA -----");
+        System.out.println("Dono: " + carro.getDono());
+        System.out.println("Matrícula: " + carro.getMatricula());
+        listarServicos(carro);
+        System.out.println("Total: " + calcularTotal(carro) + "€");
+        System.out.println("------------------");
+    }
 }
 
 

@@ -92,6 +92,9 @@ public class Carro {
                 ", quilómetros=" + quilometros +
                 '}';
     }
+    public void setHistorico(String historico) {
+        this.historico = historico;
+    }
 
 }
 
