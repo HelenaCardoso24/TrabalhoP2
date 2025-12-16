@@ -23,7 +23,7 @@ public class Servicos {
         return carros;
     }
 
-    /**  Adiciona um serviço ao histórico do carro
+    // Adiciona um serviço ao histórico do carro
     public static void adicionarServicoAoCarro(Carro carro, String servico) {
         if (servicos.contains(servico)) {
             String historicoAtual = carro.getHistorico();
@@ -32,7 +32,31 @@ public class Servicos {
         } else {
             System.out.println("Serviço não encontrado: " + servico);
         }
-    }*/
+    }
+    public static double calcularTotal(Carro carro) {
+        double total = 0;
+        String[] linhas = carro.getHistorico().split("\n");
+
+        for (String linha : linhas) {
+            if (linha.contains("€")) {
+                String valor = linha.substring(linha.indexOf("-") + 1)
+                        .replace("€", "")
+                        .trim();
+                total += Double.parseDouble(valor);
+            }
+        }
+        return total;
+    }
+
+    // 🧾 Fatura simples
+    public static void imprimirFatura(Carro carro) {
+        System.out.println("----- FATURA -----");
+        System.out.println("Dono: " + carro.getDono());
+        System.out.println("Matrícula: " + carro.getMatricula());
+        listarServicos(carro);
+        System.out.println("Total: " + calcularTotal(carro) + "€");
+        System.out.println("------------------");
+    }
 }
 
 
