@@ -107,7 +107,7 @@ public class Carro {
                 '}';
     }
     public void setHistorico(String historico) {
-        this.historico = historico;
+        this.historico = (historico == null) ? "" : historico;  // para não dar erro se tiver vazio
     }
 
 }
