@@ -65,6 +65,33 @@ public class Servicos {
         System.out.println("Total: " + calcularTotal(carro) + "€");
         System.out.println("------------------");
     }
+
+
+    public static void atribuirServico(Carro carro, Servico servico) {
+        carro.adicionarAoHistorico(servico.toString());
+    }
+
+
+    private static final List<Servico> listaServicosDetalhada = new ArrayList<>();
+
+    static {
+    listaServicosDetalhada.add(new Servico("Troca de óleo", 40));
+    listaServicosDetalhada.add(new Servico("Troca de filtros", 25));
+    listaServicosDetalhada.add(new Servico("Troca de pastilhas", 80));
+    listaServicosDetalhada.add(new Servico("Troca de discos", 150));
+    listaServicosDetalhada.add(new Servico("Troca de fluido de freio", 30));
+    listaServicosDetalhada.add(new Servico("Troca de amortecedores", 200));
+    listaServicosDetalhada.add(new Servico("Alinhamento", 35));
+    listaServicosDetalhada.add(new Servico("Diagnóstico de motor", 25));
+    listaServicosDetalhada.add(new Servico("Pequenos reparos", 20));
+    listaServicosDetalhada.add(new Servico("Troca de bateria", 90));
+    listaServicosDetalhada.add(new Servico("Alternador", 180));
+    listaServicosDetalhada.add(new Servico("Scanner automotivo", 30));
+    listaServicosDetalhada.add(new Servico("Recarga de gás", 60));
+    listaServicosDetalhada.add(new Servico("Higienização", 25));
+    listaServicosDetalhada.add(new Servico("Troca de pneus", 50));
+    listaServicosDetalhada.add(new Servico("Balanceamento", 20));
+    }
 }
 
 
