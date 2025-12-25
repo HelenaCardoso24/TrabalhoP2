@@ -20,7 +20,7 @@ public class Carro {
         this.ano = ano;
         this.combustivel = combustivel;
         this.quilometros = quilometros;
-        this.historico = historico;
+        this.historico = (historico == null) ? "" : historico; // para não dar erro se vazio
     }
 
     public String getMatricula() {
