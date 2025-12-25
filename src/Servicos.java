@@ -34,6 +34,7 @@ public class Servicos {
             System.out.println("Serviço não encontrado: " + servico);
         }
     }
+    
     public static double calcularTotal(Carro carro) {
         double total = 0;
         String[] linhas = carro.getHistorico().split("\n");
