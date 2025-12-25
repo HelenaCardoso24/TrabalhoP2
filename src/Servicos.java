@@ -9,7 +9,7 @@ public class Servicos {
 
 
     public static void newCarro(){
-        Carro carro = new Carro("","","","",0,"",0,"");
+        Carro carro = new Carro("00-AA-00","cliente","marca","modelo",2025,"gasolina",0,"");
         carros.add(carro);
     }
 
