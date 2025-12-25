@@ -111,4 +111,4 @@ public class Carro {
     }
 }
 
-
+//SE NAO APARECER PARA TI METE ISTO NA PRIMEIRA LINHA DA CLASSE APP: import java.util.Scanner
