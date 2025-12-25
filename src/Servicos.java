@@ -34,7 +34,7 @@ public class Servicos {
             System.out.println("Serviço não encontrado: " + servico);
         }
     }
-    
+
     public static double calcularTotal(Carro carro) {
         if (carro.getHistorico() == null || carro.getHistorico().isEmpty()) {
             return 0;
