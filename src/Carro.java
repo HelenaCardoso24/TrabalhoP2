@@ -80,6 +80,17 @@ public class Carro {
         return historico;
     }
 
+    private List<String> historicoLista = new ArrayList<>();  // cria a lista para o histórico
+
+    public void adicionarAoHistorico(String servico) {
+        historicoLista.add(servico);
+        historico += "- " + servico + "\n"; // para ficar igual ao que temos
+    }
+
+    public List<String> getHistoricoLista() {
+        return historicoLista;      // devolve a lista de serviços
+    }
+
     @Override //altera o comportamento quando faço print do objeto
     public String toString() {
         return "Carro{" +
