@@ -26,10 +26,7 @@ public class Servicos {
     // Adiciona um serviço ao histórico do carro
     public static void adicionarServicoAoCarro(Carro carro, String servico) {
         if (servicos.contains(servico)) {
-            String historicoAtual = carro.getHistorico();
-            historicoAtual += "- " + servico + "\n";
-            carro.setHistorico(historicoAtual);
-            // adicionar depois de configurar o historico :carro.setQuilometros(carro.getQuilometros()); // mantém os km atuais
+            carro.adicionarAoHistorico(servico);
         } else {
             System.out.println("Serviço não encontrado: " + servico);
         }
