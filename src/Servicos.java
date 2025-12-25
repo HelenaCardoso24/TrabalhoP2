@@ -49,7 +49,13 @@ public class Servicos {
         return total;
     }
 
-    // 🧾 Fatura simples
+    // para mostrar os serviços realizados
+    public static void listarServicos(Carro carro) {
+        System.out.println("Serviços realizados:");
+        System.out.println(carro.getHistorico());
+    }
+
+    // faturas
     public static void imprimirFatura(Carro carro) {
         System.out.println("----- FATURA -----");
         System.out.println("Dono: " + carro.getDono());
