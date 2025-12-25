@@ -36,6 +36,10 @@ public class Servicos {
     }
     
     public static double calcularTotal(Carro carro) {
+        if (carro.getHistorico() == null || carro.getHistorico().isEmpty()) {
+            return 0;
+        }
+
         double total = 0;
         String[] linhas = carro.getHistorico().split("\n");
 
