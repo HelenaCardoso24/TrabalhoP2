@@ -10,7 +10,8 @@ public class Carro {
     private String modelo;
     private int ano;
     private String combustivel;
-    
+    private List<Servico> historico;
+
     public Carro(String matricula, String dono, String marca, String modelo, int ano, String combustivel, int quilometros, String historico){
         this.matricula=matricula;
         this.dono = dono;
