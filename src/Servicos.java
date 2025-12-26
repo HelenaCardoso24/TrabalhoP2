@@ -34,7 +34,6 @@ public class Servicos {
         }
 
         double total = 0;
-        String[] linhas = carro.getHistorico().split("\n");
 
         for (String linha : linhas) {
             if (linha.contains("€")) {
