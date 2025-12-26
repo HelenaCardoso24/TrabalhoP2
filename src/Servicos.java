@@ -38,6 +38,7 @@ public class Servicos {
         for (Servico servico : carro.getHistorico()) {
             total += servico.getPreco();
         }
+
         return total;
     }
 
