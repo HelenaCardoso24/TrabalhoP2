@@ -12,8 +12,8 @@ public class Carro {
     private String combustivel;
     private List<Servico> historico;
 
-    public Carro(String matricula, String dono, String marca, String modelo, int ano, String combustivel, int quilometros, String historico){
-        this.matricula=matricula;
+    public Carro(String matricula, String dono, String marca, String modelo, int ano, String combustivel, int quilometros, String historico) {
+        this.matricula = matricula;
         this.dono = dono;
         this.marca = marca;
         this.modelo = modelo;
@@ -86,7 +86,7 @@ public class Carro {
     public void adicionarServico(Servico servico) {
         historico.add(servico);
     }
-    
+
     @Override //altera o comportamento quando faço print do objeto
     public String toString() {
         return "Carro{" +
