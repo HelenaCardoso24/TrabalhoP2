@@ -106,9 +106,6 @@ public class Carro {
                 ", quilómetros=" + quilometros +
                 '}';
     }
-    public void setHistorico(String historico) {
-        this.historico = (historico == null) ? "" : historico;  // para não dar erro se tiver vazio
-    }
 }
 
 //SE NAO APARECER PARA TI METE ISTO NA PRIMEIRA LINHA DA CLASSE APP: import java.util.Scanner
