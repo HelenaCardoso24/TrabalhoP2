@@ -24,12 +24,8 @@ public class Servicos {
     }
 
     // Adiciona um serviço ao histórico do carro
-    public static void adicionarServicoAoCarro(Carro carro, String servico) {
-        if (servicos.contains(servico)) {
-            carro.adicionarAoHistorico(servico);
-        } else {
-            System.out.println("Serviço não encontrado: " + servico);
-        }
+    public static void adicionarServicoAoCarro(Carro carro, Servico servico) {
+        carro.adicionarServico(servico);
     }
 
     public static double calcularTotal(Carro carro) {
