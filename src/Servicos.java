@@ -35,13 +35,8 @@ public class Servicos {
 
         double total = 0;
 
-        for (String linha : linhas) {
-            if (linha.contains("€")) {
-                String valor = linha.substring(linha.indexOf("-") + 1)
-                        .replace("€", "")
-                        .trim();
-                total += Double.parseDouble(valor);
-            }
+        for (Servico servico : carro.getHistorico()) {
+            total += servico.getPreco();
         }
         return total;
     }
