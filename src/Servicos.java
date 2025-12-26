@@ -58,12 +58,6 @@ public class Servicos {
         System.out.println("------------------");
     }
 
-
-    public static void atribuirServico(Carro carro, Servico servico) {
-        carro.adicionarAoHistorico(servico.toString());
-    }
-
-
     private static final List<Servico> listaServicosDetalhada = new ArrayList<>();
 
     static {
