@@ -4,7 +4,6 @@ import java.util.List;
 public class Carro {
 
     private String matricula;
-    private String historico; // TODO: transformar em lista
     private int quilometros;
     private String dono;
     private String marca;
