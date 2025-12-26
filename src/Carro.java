@@ -89,11 +89,7 @@ public class Carro {
         historicoLista.add(servico);
         historico += "- " + servico + "\n"; // para ficar igual ao que temos
     }
-
-    public List<String> getHistoricoLista() {
-        return historicoLista;      // devolve a lista de serviços
-    }
-
+    
     @Override //altera o comportamento quando faço print do objeto
     public String toString() {
         return "Carro{" +
