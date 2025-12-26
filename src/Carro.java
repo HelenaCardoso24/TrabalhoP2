@@ -79,7 +79,7 @@ public class Carro {
         this.combustivel = combustivel;
     }
 
-    public String getHistorico() {
+    public List<Servico> getHistorico() {
         return historico;
     }
 
