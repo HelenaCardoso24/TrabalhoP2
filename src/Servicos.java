@@ -1,82 +1,52 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Servicos {
-    static List<String> servicos = List.of("Troca de óleo", "Troca de filtros", "Troca de pastilhas", "Troca de discos", "Troca de fluido de freio", "Troca de amortecedores", "Alinhamento", "Diagnóstico de motor", "Pequenos reparos", "Troca de bateria", "Alternador", "Scanner automotivo", "Recarga de gás", "Higienização", "Troca de pneus", "Balanceamento");
+    // Mapa de serviços disponíveis: Chave (Nome) -> Valor (Preço)
+    private static final Map<String, Double> tabelaPrecos = new HashMap<>();
 
-     // Lista de carros registados
+    // Bloco estático para inicializar os preços (Faturação)
+    static {
+        tabelaPrecos.put("Troca de óleo", 60.0);
+        tabelaPrecos.put("Troca de filtros", 45.0);
+        tabelaPrecos.put("Troca de pastilhas", 80.0);
+        tabelaPrecos.put("Troca de discos", 150.0);
+        tabelaPrecos.put("Alinhamento", 35.0);
+        tabelaPrecos.put("Diagnóstico de motor", 50.0);
+        tabelaPrecos.put("Troca de bateria", 120.0);
+        tabelaPrecos.put("Recarga de gás AC", 70.0);
+        tabelaPrecos.put("Troca de pneus", 100.0);
+        tabelaPrecos.put("Balanceamento", 20.0);
+    }
+
     private static final List<Carro> carros = new ArrayList<>();
 
-
-    public static void newCarro(){
-        Carro carro = new Carro("00-AA-00","cliente","marca","modelo",2025,"gasolina",0,"");
-        carros.add(carro);
+    // Retorna os nomes dos serviços para preencher menus na Interface Gráfica
+    public static List<String> listarNomesServicos() {
+        return new ArrayList<>(tabelaPrecos.keySet());
     }
 
-    // Devolve a lista de serviços disponíveis
-    public static List<String> listarServicos() {
-        return servicos;
-    }
-
-    // Devolve a lista de carros registados
     public static List<Carro> listarCarros() {
         return carros;
     }
 
-    // Adiciona um serviço ao histórico do carro
-    public static void adicionarServicoAoCarro(Carro carro, Servico servico) {
-        carro.adicionarServico(servico);
+    public static void registarCarro(Carro carro) {
+        carros.add(carro);
     }
 
-    public static double calcularTotal(Carro carro) {
-        if (carro.getHistorico() == null || carro.getHistorico().isEmpty()) {
-            return 0;
+    /**
+     * Adiciona um serviço ao histórico do carro com base na tabela de preços.
+     */
+    public static void realizarServico(Carro carro, String nomeServico) {
+        if (tabelaPrecos.containsKey(nomeServico)) {
+            double preco = tabelaPrecos.get(nomeServico);
+            ServicoRealizado novoServico = new ServicoRealizado(nomeServico, preco);
+            carro.adicionarServico(novoServico);
+            System.out.println("Serviço '" + nomeServico + "' adicionado com sucesso ao carro " + carro.getMatricula());
+        } else {
+            System.out.println("Erro: Serviço '" + nomeServico + "' não existe na tabela de preços.");
         }
-
-        double total = 0;
-
-        for (Servico servico : carro.getHistorico()) {
-            total += servico.getPreco();
-        }
-
-        return total;
-    }
-
-    // para mostrar os serviços realizados
-    public static void listarServicos(Carro carro) {
-        System.out.println("Serviços realizados:");
-        System.out.println(carro.getHistorico());
-    }
-
-    // faturas
-    public static void imprimirFatura(Carro carro) {
-        System.out.println("----- FATURA -----");
-        System.out.println("Dono: " + carro.getDono());
-        System.out.println("Matrícula: " + carro.getMatricula());
-        listarServicos(carro);
-        System.out.println("Total: " + calcularTotal(carro) + "€");
-        System.out.println("------------------");
-    }
-
-    private static final List<Servico> listaServicosDetalhada = new ArrayList<>();
-
-    static {
-    listaServicosDetalhada.add(new Servico("Troca de óleo", 40));
-    listaServicosDetalhada.add(new Servico("Troca de filtros", 25));
-    listaServicosDetalhada.add(new Servico("Troca de pastilhas", 80));
-    listaServicosDetalhada.add(new Servico("Troca de discos", 150));
-    listaServicosDetalhada.add(new Servico("Troca de fluido de freio", 30));
-    listaServicosDetalhada.add(new Servico("Troca de amortecedores", 200));
-    listaServicosDetalhada.add(new Servico("Alinhamento", 35));
-    listaServicosDetalhada.add(new Servico("Diagnóstico de motor", 25));
-    listaServicosDetalhada.add(new Servico("Pequenos reparos", 20));
-    listaServicosDetalhada.add(new Servico("Troca de bateria", 90));
-    listaServicosDetalhada.add(new Servico("Alternador", 180));
-    listaServicosDetalhada.add(new Servico("Scanner automotivo", 30));
-    listaServicosDetalhada.add(new Servico("Recarga de gás", 60));
-    listaServicosDetalhada.add(new Servico("Higienização", 25));
-    listaServicosDetalhada.add(new Servico("Troca de pneus", 50));
-    listaServicosDetalhada.add(new Servico("Balanceamento", 20));
     }
 }
-
