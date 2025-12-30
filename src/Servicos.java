@@ -23,7 +23,7 @@ public class Servicos {
         return carros;
     }
 
-    // Adiciona um serviço ao histórico do carro
+    /**  Adiciona um serviço ao histórico do carro
     public static void adicionarServicoAoCarro(Carro carro, String servico) {
         if (servicos.contains(servico)) {
             String historicoAtual = carro.getHistorico();
@@ -32,7 +32,7 @@ public class Servicos {
         } else {
             System.out.println("Serviço não encontrado: " + servico);
         }
-    }
+    }*/
 }
 
 
