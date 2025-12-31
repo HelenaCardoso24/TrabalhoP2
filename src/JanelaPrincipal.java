@@ -1,0 +1,194 @@
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.util.List;
+
+public class JanelaPrincipal extends JFrame {
+    private JTable tabelaVeiculos;
+    private DefaultTableModel modeloTabela;
+
+    public JanelaPrincipal() {
+        setTitle("Oficina Mecânica - Gestão de Veículos");
+        setSize(1000, 600);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+        setLayout(new BorderLayout());
+
+        // --- PAINEL SUPERIOR ---
+        JPanel painelTitulo = new JPanel();
+        painelTitulo.setBackground(new Color(30, 30, 30));
+        JLabel lblTitulo = new JLabel("Sistema de Faturação e Relatórios", SwingConstants.CENTER);
+        lblTitulo.setForeground(Color.WHITE);
+        lblTitulo.setFont(new Font("Arial", Font.BOLD, 22));
+        painelTitulo.add(lblTitulo);
+        add(painelTitulo, BorderLayout.NORTH);
+
+        // --- TABELA (Polimorfismo: mostra todos os Veiculos) ---
+        String[] colunas = {"Tipo", "Matrícula", "Dono", "Marca/Modelo", "Info Extra", "Total Gasto"};
+        modeloTabela = new DefaultTableModel(colunas, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) { return false; }
+        };
+
+        tabelaVeiculos = new JTable(modeloTabela);
+        add(new JScrollPane(tabelaVeiculos), BorderLayout.CENTER);
+
+        // --- PAINEL LATERAL ---
+        JPanel painelBotoes = new JPanel(new GridLayout(6, 1, 10, 10));
+        painelBotoes.setBorder(BorderFactory.createEmptyBorder(20, 10, 20, 10));
+
+        JButton btnNovo = new JButton("Novo Veículo");
+        JButton btnAddServico = new JButton("Registar Serviço");
+        JButton btnRelatorio = new JButton("Fatura / Relatório");
+        JButton btnRemover = new JButton("Remover Veículo");
+        JButton btnSair = new JButton("Sair");
+
+        btnNovo.addActionListener(e -> abrirFormularioNovoVeiculo());
+        btnRelatorio.addActionListener(e -> verRelatorio());
+        btnAddServico.addActionListener(e -> adicionarServico());
+        btnRemover.addActionListener(e -> removerVeiculo());
+        btnSair.addActionListener(e -> {
+            Servicos.guardarDados(); // Garante a escrita no ficheiro antes de fechar
+            System.exit(0);
+        });
+
+        painelBotoes.add(btnNovo);
+        painelBotoes.add(btnAddServico);
+        painelBotoes.add(btnRelatorio);
+        painelBotoes.add(btnRemover);
+        painelBotoes.add(new JSeparator());
+        painelBotoes.add(btnSair);
+
+        add(painelBotoes, BorderLayout.EAST);
+        atualizarTabela();
+    }
+
+    private void abrirFormularioNovoVeiculo() {
+        String[] tipos = {"Carro Ligeiro", "Motociclo"};
+        JComboBox<String> comboTipo = new JComboBox<>(tipos);
+
+        JTextField txtMatricula = new JTextField();
+        // Formatação automática da matrícula que pediste
+        txtMatricula.addKeyListener(new KeyAdapter() {
+            public void keyReleased(KeyEvent e) {
+                String val = txtMatricula.getText().replace("-", "").toUpperCase();
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < val.length(); i++) {
+                    if (i > 0 && i % 2 == 0 && i < 6) sb.append("-");
+                    sb.append(val.charAt(i));
+                }
+                if (sb.length() <= 8) txtMatricula.setText(sb.toString());
+            }
+        });
+
+        JTextField txtDono = new JTextField();
+        JTextField txtMarca = new JTextField();
+        JTextField txtModelo = new JTextField();
+        JTextField txtAno = new JTextField();
+        JTextField txtKM = new JTextField();
+        JTextField txtExtra = new JTextField(); // Portas ou Cilindrada
+        JLabel lblExtra = new JLabel("Nº Portas:");
+
+        comboTipo.addActionListener(e -> {
+            lblExtra.setText(comboTipo.getSelectedIndex() == 0 ? "Nº Portas:" : "Cilindrada:");
+        });
+
+        Object[] form = {
+                "Tipo:", comboTipo,
+                "Matrícula (AA00AA):", txtMatricula,
+                "Dono:", txtDono,
+                "Marca:", txtMarca,
+                "Modelo:", txtModelo,
+                "Ano:", txtAno,
+                "KM:", txtKM,
+                lblExtra, txtExtra
+        };
+
+        int res = JOptionPane.showConfirmDialog(this, form, "Novo Registo", JOptionPane.OK_CANCEL_OPTION);
+        if (res == JOptionPane.OK_OPTION) {
+            try {
+                int ano = Integer.parseInt(txtAno.getText());
+                int km = Integer.parseInt(txtKM.getText());
+                int extra = Integer.parseInt(txtExtra.getText());
+
+                Veiculo v;
+                if (comboTipo.getSelectedIndex() == 0) {
+                    v = new CarroLigeiro(txtMatricula.getText(), txtDono.getText(), txtMarca.getText(), txtModelo.getText(), ano, km, extra);
+                } else {
+                    v = new Motociclo(txtMatricula.getText(), txtDono.getText(), txtMarca.getText(), txtModelo.getText(), ano, km, extra);
+                }
+
+                Servicos.registarVeiculo(v);
+                atualizarTabela();
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Dados inválidos!");
+            }
+        }
+    }
+
+    private void atualizarTabela() {
+        modeloTabela.setRowCount(0);
+        for (Veiculo v : Servicos.listarVeiculos()) {
+            String infoExtra = (v instanceof CarroLigeiro) ?
+                    ((CarroLigeiro)v).getNumPortas() + " Portas" :
+                    ((Motociclo)v).getCilindrada() + "cc";
+
+            Object[] row = {
+                    v.getClass().getSimpleName(),
+                    v.getMatricula(),
+                    v.getDono(),
+                    v.getMarca() + " " + v.getModelo(),
+                    infoExtra,
+                    String.format("%.2f€", v.calcularTotalGasto())
+            };
+            modeloTabela.addRow(row);
+        }
+    }
+
+    private void verRelatorio() {
+        int index = tabelaVeiculos.getSelectedRow();
+        if (index == -1) return;
+        String mat = (String) modeloTabela.getValueAt(index, 1);
+        Veiculo v = Servicos.listarVeiculos().stream().filter(x -> x.getMatricula().equals(mat)).findFirst().orElse(null);
+
+        if (v != null) {
+            StringBuilder sb = new StringBuilder("=== RELATÓRIO / FATURA ===\n");
+            sb.append("Veículo: ").append(v.toString()).append("\n");
+            sb.append("Dono: ").append(v.getDono()).append("\n");
+            sb.append("---------------------------\n");
+            v.getHistorico().forEach(s -> sb.append(s.toString()).append("\n"));
+            sb.append("---------------------------\n");
+            sb.append("TOTAL A PAGAR: ").append(String.format("%.2f€", v.calcularTotalGasto()));
+
+            JTextArea area = new JTextArea(sb.toString());
+            JOptionPane.showMessageDialog(this, new JScrollPane(area), "Fatura", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+
+    private void adicionarServico() {
+        int index = tabelaVeiculos.getSelectedRow();
+        if (index == -1) return;
+        String mat = (String) modeloTabela.getValueAt(index, 1);
+        Veiculo v = Servicos.listarVeiculos().stream().filter(x -> x.getMatricula().equals(mat)).findFirst().orElse(null);
+
+        List<String> opcoes = Servicos.listarNomesServicos();
+        String s = (String) JOptionPane.showInputDialog(this, "Serviço:", "Oficina", 0, null, opcoes.toArray(), opcoes.get(0));
+
+        if (s != null) {
+            Servicos.realizarServico(v, s);
+            atualizarTabela();
+        }
+    }
+
+    private void removerVeiculo() {
+        int index = tabelaVeiculos.getSelectedRow();
+        if (index == -1) return;
+        String mat = (String) modeloTabela.getValueAt(index, 1);
+        if (Servicos.removerVeiculo(mat)) {
+            atualizarTabela();
+            JOptionPane.showMessageDialog(this, "Removido!");
+        }
+    }
+}
