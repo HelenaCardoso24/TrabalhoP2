@@ -1,49 +1,39 @@
-import java.util.Scanner;
-import java.util.List;
+import javax.swing.SwingUtilities;
 
 public class App {
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
+        // 1. CARREGAR DADOS DO FICHEIRO (Obrigatório para nota 16-20)
+        // Tenta carregar os dados guardados em "oficina_dados.csv"
+        Servicos.carregarDados();
 
-        // 1. Criar um carro de teste
-        // Nota: O construtor agora não recebe a String de histórico, pois criamos a lista internamente
-        Carro meuCarro = new Carro("AA-00-BB", "João Silva", "Toyota", "Corolla", 2020, "Híbrido", 50000);
+        // 2. VERIFICAÇÃO DE DADOS INICIAIS
+        // Se a lista estiver vazia (primeira vez que corre), cria dados de exemplo
+        if (Servicos.listarVeiculos().isEmpty()) {
+            System.out.println("Nenhum dado encontrado. Criando veículos de teste...");
 
-        // Registar o carro no sistema
-        Servicos.registarCarro(meuCarro);
+            // Exemplo de Polimorfismo: Criar um Carro e um Motociclo
+            CarroLigeiro c1 = new CarroLigeiro("AA-11-BB", "Helena Cardoso", "VW", "Golf", 2022, 15000, 5);
+            Motociclo m1 = new Motociclo("99-ZZ-11", "Ricardo Jorge", "Yamaha", "MT-07", 2021, 5000, 689);
 
-        System.out.println("--- Sistema de Gestão de Oficina ---");
-        System.out.println("Carro registado: " + meuCarro.getMarca() + " " + meuCarro.getModelo());
+            Servicos.registarVeiculo(c1);
+            Servicos.registarVeiculo(m1);
 
-        // 2. Simular a adição de serviços (Faturação)
-        System.out.println("\nAdicionando serviços...");
-        Servicos.realizarServico(meuCarro, "Troca de óleo");
-        Servicos.realizarServico(meuCarro, "Alinhamento");
-        Servicos.realizarServico(meuCarro, "Troca de filtros");
-
-        // 3. Gerar Relatório de Estado e Fatura
-        System.out.println("\n========================================");
-        System.out.println("      RELATÓRIO DE ESTADO DO VEÍCULO    ");
-        System.out.println("========================================");
-        System.out.println("Proprietário: " + meuCarro.getDono());
-        System.out.println("Matrícula:    " + meuCarro.getMatricula());
-        System.out.println("Quilómetros:  " + meuCarro.getQuilometros() + " km");
-        System.out.println("----------------------------------------");
-        System.out.println("Histórico de Trabalhos:");
-
-        List<ServicoRealizado> historico = meuCarro.getHistorico();
-        if (historico.isEmpty()) {
-            System.out.println("Nenhum serviço registado.");
-        } else {
-            for (ServicoRealizado s : historico) {
-                System.out.println("- " + s.toString());
-            }
+            // Adicionar serviços iniciais usando a Sobrecarga de Métodos
+            Servicos.realizarServico(c1, "Troca de óleo");
+            Servicos.realizarServico(m1, "Revisão Geral", 120.0); // Exemplo de preço manual
         }
 
-        System.out.println("----------------------------------------");
-        System.out.printf("TOTAL A PAGAR (Fatura): %.2f€\n", meuCarro.calcularTotalGasto());
-        System.out.println("========================================");
+        // 3. LANÇAR A INTERFACE GRÁFICA (Swing)
+        SwingUtilities.invokeLater(() -> {
+            try {
+                // Define o aspeto visual do sistema operativo (opcional, mas fica mais bonito)
+                javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
-        scanner.close();
+            JanelaPrincipal gui = new JanelaPrincipal();
+            gui.setVisible(true);
+        });
     }
 }
