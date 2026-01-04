@@ -1,82 +1,77 @@
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.io.*;
 
 public class Servicos {
-    static List<String> servicos = List.of("Troca de óleo", "Troca de filtros", "Troca de pastilhas", "Troca de discos", "Troca de fluido de freio", "Troca de amortecedores", "Alinhamento", "Diagnóstico de motor", "Pequenos reparos", "Troca de bateria", "Alternador", "Scanner automotivo", "Recarga de gás", "Higienização", "Troca de pneus", "Balanceamento");
-
-     // Lista de carros registados
-    private static final List<Carro> carros = new ArrayList<>();
-
-
-    public static void newCarro(){
-        Carro carro = new Carro("00-AA-00","cliente","marca","modelo",2025,"gasolina",0,"");
-        carros.add(carro);
-    }
-
-    // Devolve a lista de serviços disponíveis
-    public static List<String> listarServicos() {
-        return servicos;
-    }
-
-    // Devolve a lista de carros registados
-    public static List<Carro> listarCarros() {
-        return carros;
-    }
-
-    // Adiciona um serviço ao histórico do carro
-    public static void adicionarServicoAoCarro(Carro carro, Servico servico) {
-        carro.adicionarServico(servico);
-    }
-
-    public static double calcularTotal(Carro carro) {
-        if (carro.getHistorico() == null || carro.getHistorico().isEmpty()) {
-            return 0;
-        }
-
-        double total = 0;
-
-        for (Servico servico : carro.getHistorico()) {
-            total += servico.getPreco();
-        }
-
-        return total;
-    }
-
-    // para mostrar os serviços realizados
-    public static void listarServicos(Carro carro) {
-        System.out.println("Serviços realizados:");
-        System.out.println(carro.getHistorico());
-    }
-
-    // faturas
-    public static void imprimirFatura(Carro carro) {
-        System.out.println("----- FATURA -----");
-        System.out.println("Dono: " + carro.getDono());
-        System.out.println("Matrícula: " + carro.getMatricula());
-        listarServicos(carro);
-        System.out.println("Total: " + calcularTotal(carro) + "€");
-        System.out.println("------------------");
-    }
-
-    private static final List<Servico> listaServicosDetalhada = new ArrayList<>();
+    private static final Map<String, Double> tabelaPrecos = new HashMap<>();
+    private static final List<Veiculo> veiculos = new ArrayList<>();
+    private static final String FICHEIRO = "oficina_dados.csv";
 
     static {
-    listaServicosDetalhada.add(new Servico("Troca de óleo", 40));
-    listaServicosDetalhada.add(new Servico("Troca de filtros", 25));
-    listaServicosDetalhada.add(new Servico("Troca de pastilhas", 80));
-    listaServicosDetalhada.add(new Servico("Troca de discos", 150));
-    listaServicosDetalhada.add(new Servico("Troca de fluido de freio", 30));
-    listaServicosDetalhada.add(new Servico("Troca de amortecedores", 200));
-    listaServicosDetalhada.add(new Servico("Alinhamento", 35));
-    listaServicosDetalhada.add(new Servico("Diagnóstico de motor", 25));
-    listaServicosDetalhada.add(new Servico("Pequenos reparos", 20));
-    listaServicosDetalhada.add(new Servico("Troca de bateria", 90));
-    listaServicosDetalhada.add(new Servico("Alternador", 180));
-    listaServicosDetalhada.add(new Servico("Scanner automotivo", 30));
-    listaServicosDetalhada.add(new Servico("Recarga de gás", 60));
-    listaServicosDetalhada.add(new Servico("Higienização", 25));
-    listaServicosDetalhada.add(new Servico("Troca de pneus", 50));
-    listaServicosDetalhada.add(new Servico("Balanceamento", 20));
+        tabelaPrecos.put("Troca de óleo", 60.0);
+        tabelaPrecos.put("Troca de filtros", 45.0);
+        tabelaPrecos.put("Troca de pastilhas", 80.0);
+        tabelaPrecos.put("Alinhamento", 35.0);
+        tabelaPrecos.put("Revisão Geral", 150.0);
+    }
+
+    public static void registarVeiculo(Veiculo v) {
+        veiculos.add(v);
+    }
+
+    // SOBRECARGA 1: Método padrão que usa a tabela de preços
+    public static void realizarServico(Veiculo v, String nomeServico) {
+        if (tabelaPrecos.containsKey(nomeServico)) {
+            realizarServico(v, nomeServico, tabelaPrecos.get(nomeServico));
+        }
+    }
+
+    // SOBRECARGA 2: Permite inserir um preço manual (Requisito de Sobrecarga)
+    public static void realizarServico(Veiculo v, String nomeServico, double preco) {
+        ServicoRealizado novo = new ServicoRealizado(nomeServico, preco);
+        v.adicionarServico(novo);
+    }
+
+    public static List<Veiculo> listarVeiculos() { return veiculos; }
+
+    public static List<String> listarNomesServicos() { return new ArrayList<>(tabelaPrecos.keySet()); }
+
+    public static boolean removerVeiculo(String matricula) {
+        return veiculos.removeIf(v -> v.getMatricula().equalsIgnoreCase(matricula));
+    }
+
+    // --- PERSISTÊNCIA DE DADOS (Nota 16-20) ---
+
+    public static void guardarDados() {
+        try (PrintWriter pw = new PrintWriter(new FileWriter(FICHEIRO))) {
+            for (Veiculo v : veiculos) {
+                String tipo = (v instanceof CarroLigeiro) ? "CARRO" : "MOTA";
+                int extra = (v instanceof CarroLigeiro) ? ((CarroLigeiro)v).getNumPortas() : ((Motociclo)v).getCilindrada();
+
+                // Formato: TIPO;MATRICULA;DONO;MARCA;MODELO;ANO;KM;EXTRA
+                pw.println(tipo + ";" + v.getMatricula() + ";" + v.getDono() + ";" +
+                        v.getMarca() + ";" + v.getModelo() + ";" + v.getAno() + ";" +
+                        v.getQuilometros() + ";" + extra);
+            }
+        } catch (IOException e) {
+            System.err.println("Erro ao guardar: " + e.getMessage());
+        }
+    }
+
+    public static void carregarDados() {
+        File f = new File(FICHEIRO);
+        if (!f.exists()) return;
+        try (BufferedReader br = new BufferedReader(new FileReader(f))) {
+            String linha;
+            while ((linha = br.readLine()) != null) {
+                String[] d = linha.split(";");
+                if (d[0].equals("CARRO")) {
+                    registarVeiculo(new CarroLigeiro(d[1], d[2], d[3], d[4], Integer.parseInt(d[5]), Integer.parseInt(d[6]), Integer.parseInt(d[7])));
+                } else {
+                    registarVeiculo(new Motociclo(d[1], d[2], d[3], d[4], Integer.parseInt(d[5]), Integer.parseInt(d[6]), Integer.parseInt(d[7])));
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Erro ao carregar: " + e.getMessage());
+        }
     }
 }
-

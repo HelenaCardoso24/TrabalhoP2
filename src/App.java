@@ -1,22 +1,39 @@
-import java.util.Scanner;
+import javax.swing.SwingUtilities;
 
 public class App {
-    public static void main(String[] args) throws Exception {
-        Scanner sc = new Scanner(System.in);
-        int opcao;
+    public static void main(String[] args) {
+        // 1. CARREGAR DADOS DO FICHEIRO (Obrigatório para nota 16-20)
+        // Tenta carregar os dados guardados em "oficina_dados.csv"
+        Servicos.carregarDados();
 
-        do {
-            System.out.println("1 - Criar carro");
-            System.out.println("2 - Listar carros");
-            System.out.println("0 - Sair");
-            opcao = sc.nextInt();
+        // 2. VERIFICAÇÃO DE DADOS INICIAIS
+        // Se a lista estiver vazia (primeira vez que corre), cria dados de exemplo
+        if (Servicos.listarVeiculos().isEmpty()) {
+            System.out.println("Nenhum dado encontrado. Criando veículos de teste...");
 
-            switch (opcao) {
-                case 1 -> Servicos.newCarro();
-                case 2 -> Servicos.listarCarros().forEach(System.out::println);
+            // Exemplo de Polimorfismo: Criar um Carro e um Motociclo
+            CarroLigeiro c1 = new CarroLigeiro("AA-11-BB", "Helena Cardoso", "VW", "Golf", 2022, 15000, 5);
+            Motociclo m1 = new Motociclo("99-ZZ-11", "Ricardo Jorge", "Yamaha", "MT-07", 2021, 5000, 689);
+
+            Servicos.registarVeiculo(c1);
+            Servicos.registarVeiculo(m1);
+
+            // Adicionar serviços iniciais usando a Sobrecarga de Métodos
+            Servicos.realizarServico(c1, "Troca de óleo");
+            Servicos.realizarServico(m1, "Revisão Geral", 120.0); // Exemplo de preço manual
+        }
+
+        // 3. LANÇAR A INTERFACE GRÁFICA (Swing)
+        SwingUtilities.invokeLater(() -> {
+            try {
+                // Define o aspeto visual do sistema operativo (opcional, mas fica mais bonito)
+                javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        } while (opcao != 0);
 
-        sc.close();
+            JanelaPrincipal gui = new JanelaPrincipal();
+            gui.setVisible(true);
+        });
     }
 }
