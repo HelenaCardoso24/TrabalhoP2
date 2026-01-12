@@ -4,6 +4,9 @@ import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.List;
+import java.util.Calendar;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 public class JanelaPrincipal extends JFrame {
     private JTable tabelaVeiculos;
@@ -97,7 +100,7 @@ public class JanelaPrincipal extends JFrame {
 
         Object[] form = {
                 "Tipo:", comboTipo,
-                "Matrícula (AA00AA):", txtMatricula,
+                "Matrícula (AA-00-AA):", txtMatricula,
                 "Dono:", txtDono,
                 "Marca:", txtMarca,
                 "Modelo:", txtModelo,
@@ -109,13 +112,35 @@ public class JanelaPrincipal extends JFrame {
         int res = JOptionPane.showConfirmDialog(this, form, "Novo Registo", JOptionPane.OK_CANCEL_OPTION);
         if (res == JOptionPane.OK_OPTION) {
             try {
+                String matricula = txtMatricula.getText();
+                String regex = "^(?!([A-Z]{2}-){2}[A-Z]{2}$)" + "(?!([0-9]{2}-){2}[0-9]{2}$)" + "([A-Z]{2}|[0-9]{2})-([A-Z]{2}|[0-9]{2})-([A-Z]{2}|[0-9]{2})$";
+                Matcher matcher =  Pattern.compile(regex).matcher(matricula);
+
+                if(!matcher.matches()){
+                    JOptionPane.showMessageDialog(this, "Dados inválidos!\nEste formato de matrícula não é válido");
+                    return;
+                }
+
+                int ano_atual = Calendar.getInstance().get(Calendar.YEAR);
+                String anoAtual = String.valueOf(ano_atual);
+
                 int ano = Integer.parseInt(txtAno.getText());
+                if(ano < 1920 || ano > ano_atual){
+                    JOptionPane.showMessageDialog(this, "Dados inválidos!\nAno tem que estar entre 1920 e " + anoAtual);
+                    return;
+                }
+                
                 int km = Integer.parseInt(txtKM.getText());
+                if(km < 0){
+                    JOptionPane.showMessageDialog(this, "Dados de quilometros inválidos!\n");
+                    return;
+                }
+
                 int extra = Integer.parseInt(txtExtra.getText());
 
                 Veiculo v;
                 if (comboTipo.getSelectedIndex() == 0) {
-                    v = new CarroLigeiro(txtMatricula.getText(), txtDono.getText(), txtMarca.getText(), txtModelo.getText(), ano, km, extra);
+                    v = new CarroLigeiro(matricula, txtDono.getText(), txtMarca.getText(), txtModelo.getText(), ano, km, extra);
                 } else {
                     v = new Motociclo(txtMatricula.getText(), txtDono.getText(), txtMarca.getText(), txtModelo.getText(), ano, km, extra);
                 }
@@ -123,7 +148,7 @@ public class JanelaPrincipal extends JFrame {
                 Servicos.registarVeiculo(v);
                 atualizarTabela();
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Dados inválidos!");
+                JOptionPane.showMessageDialog(this, "Dados inválidos!\n" + ex.getMessage());
             }
         }
     }
