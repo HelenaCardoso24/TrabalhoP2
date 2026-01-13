@@ -36,7 +36,9 @@ public class JanelaPrincipal extends JFrame {
         String[] colunas = {"Tipo", "Matrícula", "Dono", "Marca/Modelo", "Info Extra", "Total Gasto"};
         modeloTabela = new DefaultTableModel(colunas, 0) {
             @Override
-            public boolean isCellEditable(int row, int column) { return false; }
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
         };
 
         tabelaVeiculos = new JTable(modeloTabela);
@@ -44,27 +46,28 @@ public class JanelaPrincipal extends JFrame {
         tabelaVeiculos.setSelectionBackground(rosaForte); // Cor quando selecionas uma linha
         tabelaVeiculos.getTableHeader().setBackground(rosaForte); // Cabeçalho rosa
         tabelaVeiculos.getTableHeader().setForeground(Color.WHITE);
-    
+
         JScrollPane scrollPane = new JScrollPane(tabelaVeiculos);
         scrollPane.getViewport().setBackground(rosaFundo); // Fundo da área vazia da tabela
         add(scrollPane, BorderLayout.CENTER);
 
         // --- PAINEL LATERAL ---
-        JPanel painelBotoes = new JPanel(new GridLayout(6, 1, 10, 10));
+        JPanel painelBotoes = new JPanel(new GridLayout(7, 1, 10, 10));
 
 
-        painelBotoes.setBackground(rosaFundo); 
+        painelBotoes.setBackground(rosaFundo);
         painelBotoes.setBorder(BorderFactory.createEmptyBorder(20, 10, 20, 10));
 
         // Inicialização dos botões
         JButton btnNovo = new JButton("Novo Veículo");
         JButton btnAddServico = new JButton("Registar Serviço");
         JButton btnRelatorio = new JButton("Fatura / Relatório");
+        JButton btnPesquisa = new JButton("Pesquisa");
         JButton btnRemover = new JButton("Remover Veículo");
         JButton btnSair = new JButton("Sair");
 
         // --- ESTILIZAÇÃO DOS BOTÕES ---
-        JButton[] todosBotoes = {btnNovo, btnAddServico, btnRelatorio, btnRemover, btnSair};
+        JButton[] todosBotoes = {btnNovo, btnAddServico, btnRelatorio,btnPesquisa, btnRemover, btnSair};
         for (JButton btn : todosBotoes) {
             btn.setBackground(Color.WHITE);      // Fundo do botão branco
             btn.setForeground(rosaForte);       // Texto em rosa forte
@@ -77,6 +80,7 @@ public class JanelaPrincipal extends JFrame {
         btnNovo.addActionListener(e -> abrirFormularioNovoVeiculo());
         btnRelatorio.addActionListener(e -> verRelatorio());
         btnAddServico.addActionListener(e -> adicionarServico());
+        btnPesquisa.addActionListener(e -> abrirPesquisa());
         btnRemover.addActionListener(e -> removerVeiculo());
         btnSair.addActionListener(e -> {
             Servicos.guardarDados();
@@ -87,13 +91,14 @@ public class JanelaPrincipal extends JFrame {
         painelBotoes.add(btnNovo);
         painelBotoes.add(btnAddServico);
         painelBotoes.add(btnRelatorio);
+        painelBotoes.add(btnPesquisa);
         painelBotoes.add(btnRemover);
-        
+
         // Separador invisível ou rosa
         JSeparator sep = new JSeparator();
-        sep.setForeground(rosaFundo); 
+        sep.setForeground(rosaFundo);
         painelBotoes.add(sep);
-        
+
         painelBotoes.add(btnSair);
 
         add(painelBotoes, BorderLayout.EAST);
@@ -145,9 +150,9 @@ public class JanelaPrincipal extends JFrame {
             try {
                 String matricula = txtMatricula.getText();
                 String regex = "^(?!([A-Z]{2}-){2}[A-Z]{2}$)" + "(?!([0-9]{2}-){2}[0-9]{2}$)" + "([A-Z]{2}|[0-9]{2})-([A-Z]{2}|[0-9]{2})-([A-Z]{2}|[0-9]{2})$";
-                Matcher matcher =  Pattern.compile(regex).matcher(matricula);
+                Matcher matcher = Pattern.compile(regex).matcher(matricula);
 
-                if(!matcher.matches()){
+                if (!matcher.matches()) {
                     JOptionPane.showMessageDialog(this, "Dados inválidos!\nEste formato de matrícula não é válido");
                     return;
                 }
@@ -156,13 +161,13 @@ public class JanelaPrincipal extends JFrame {
                 String anoAtual = String.valueOf(ano_atual);
 
                 int ano = Integer.parseInt(txtAno.getText());
-                if(ano < 1920 || ano > ano_atual){
+                if (ano < 1920 || ano > ano_atual) {
                     JOptionPane.showMessageDialog(this, "Dados inválidos!\nAno tem que estar entre 1920 e " + anoAtual);
                     return;
                 }
-                
+
                 int km = Integer.parseInt(txtKM.getText());
-                if(km < 0){
+                if (km < 0) {
                     JOptionPane.showMessageDialog(this, "Dados de quilometros inválidos!\n");
                     return;
                 }
@@ -188,8 +193,8 @@ public class JanelaPrincipal extends JFrame {
         modeloTabela.setRowCount(0);
         for (Veiculo v : Servicos.listarVeiculos()) {
             String infoExtra = (v instanceof CarroLigeiro) ?
-                    ((CarroLigeiro)v).getNumPortas() + " Portas" :
-                    ((Motociclo)v).getCilindrada() + "cc";
+                    ((CarroLigeiro) v).getNumPortas() + " Portas" :
+                    ((Motociclo) v).getCilindrada() + "cc";
 
             Object[] row = {
                     v.getClass().getSimpleName(),
@@ -245,6 +250,189 @@ public class JanelaPrincipal extends JFrame {
         if (Servicos.removerVeiculo(mat)) {
             atualizarTabela();
             JOptionPane.showMessageDialog(this, "Removido!");
+        }
+    }
+
+    private void abrirPesquisa() {
+        String[] opcoes = {"Por Matrícula", "Por Dono", "Por Marca"};
+
+        String filtro = (String) JOptionPane.showInputDialog(
+                this,
+                "Escolha o filtro:",
+                "Pesquisa",
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                opcoes,
+                opcoes[0]
+        );
+
+        if (filtro == null) return;
+
+        switch (filtro) {
+            case "Por Matrícula":
+                JTextField txtMatricula = new JTextField();
+
+                // KeyListener para transformar em maiúsculas e adicionar traços automaticamente
+                txtMatricula.addKeyListener(new KeyAdapter() {
+                    @Override
+                    public void keyReleased(KeyEvent e) {
+                        String val = txtMatricula.getText().replace("-", "").toUpperCase();
+                        if (val.length() > 6) val = val.substring(0, 6); // Limitar a 6 caracteres
+
+                        StringBuilder sb = new StringBuilder();
+                        for (int i = 0; i < val.length(); i++) {
+                            if (i == 2 || i == 4) sb.append("-");
+                            sb.append(val.charAt(i));
+                        }
+
+                        txtMatricula.setText(sb.toString());
+                        txtMatricula.setCaretPosition(txtMatricula.getText().length()); // Cursor no final
+                    }
+                });
+
+                int resMat = JOptionPane.showConfirmDialog(
+                        this,
+                        txtMatricula,
+                        "Matrícula:",
+                        JOptionPane.OK_CANCEL_OPTION
+                );
+
+                if (resMat == JOptionPane.OK_OPTION) {
+                    filtrarPorMatricula(txtMatricula.getText());
+                }
+                break;
+
+            case "Por Dono":
+                JTextField txtDono = new JTextField();
+
+                // KeyListener para capitalizar primeira letra de cada palavra
+                txtDono.addKeyListener(new KeyAdapter() {
+                    @Override
+                    public void keyReleased(KeyEvent e) {
+                        String val = txtDono.getText().toLowerCase();
+                        StringBuilder sb = new StringBuilder();
+                        boolean capitalize = true;
+
+                        for (int i = 0; i < val.length(); i++) {
+                            char c = val.charAt(i);
+                            if (capitalize && Character.isLetter(c)) {
+                                sb.append(Character.toUpperCase(c));
+                                capitalize = false;
+                            } else {
+                                sb.append(c);
+                            }
+                            if (c == ' ') capitalize = true; // Próxima letra depois de espaço é maiúscula
+                        }
+
+                        txtDono.setText(sb.toString());
+                        txtDono.setCaretPosition(txtDono.getText().length()); // Cursor no final
+                    }
+                });
+
+                int resDono = JOptionPane.showConfirmDialog(
+                        this,
+                        txtDono,
+                        "Nome do Dono:",
+                        JOptionPane.OK_CANCEL_OPTION
+                );
+
+                if (resDono == JOptionPane.OK_OPTION) {
+                    filtrarPorDono(txtDono.getText());
+                }
+                break;
+
+            case "Por Marca":
+                String marca = JOptionPane.showInputDialog("Marca:");
+                if (marca != null) filtrarPorMarca(marca);
+                break;
+        }
+    }
+
+    private void filtrarPorMatricula(String matricula) {
+        modeloTabela.setRowCount(0);
+
+        try {
+            String val = matricula.replace("-", "").toUpperCase();
+            if (val.length() > 6) val = val.substring(0, 6);
+
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < val.length(); i++) {
+                if (i == 2 || i == 4) sb.append("-");
+                sb.append(val.charAt(i));
+            }
+            String matriculaFormatada = sb.toString();
+
+            String regex = "^(?!([A-Z]{2}-){2}[A-Z]{2}$)(?!([0-9]{2}-){2}[0-9]{2}$)([A-Z]{2}|[0-9]{2})-([A-Z]{2}|[0-9]{2})-([A-Z]{2}|[0-9]{2})$";
+            Matcher matcher = Pattern.compile(regex).matcher(matriculaFormatada);
+            if (!matcher.matches()) {
+                JOptionPane.showMessageDialog(this, "Matrícula inválida! Use formato AA-00-AA ou 00-AA-00");
+                return;
+            }
+
+            for (Veiculo v : Servicos.listarVeiculos()) {
+                if (v.getMatricula().equalsIgnoreCase(matriculaFormatada)) {
+                    String infoExtra = (v instanceof CarroLigeiro) ?
+                            ((CarroLigeiro) v).getNumPortas() + " Portas" :
+                            ((Motociclo) v).getCilindrada() + "cc";
+
+                    Object[] row = {
+                            v.getClass().getSimpleName(),
+                            v.getMatricula(),
+                            v.getDono(),
+                            v.getMarca() + " " + v.getModelo(),
+                            infoExtra,
+                            String.format("%.2f€", v.calcularTotalGasto())
+                    };
+                    modeloTabela.addRow(row);
+                }
+            }
+
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Erro ao filtrar matrícula:\n" + ex.getMessage());
+        }
+    }
+
+    private void filtrarPorDono(String dono) {
+        modeloTabela.setRowCount(0);
+
+        for (Veiculo v : Servicos.listarVeiculos()) {
+            if (v.getDono().equalsIgnoreCase(dono)) {
+                String infoExtra = (v instanceof CarroLigeiro) ?
+                        ((CarroLigeiro) v).getNumPortas() + " Portas" :
+                        ((Motociclo) v).getCilindrada() + "cc";
+
+                Object[] row = {
+                        v.getClass().getSimpleName(),
+                        v.getMatricula(),
+                        v.getDono(),
+                        v.getMarca() + " " + v.getModelo(),
+                        infoExtra,
+                        String.format("%.2f€", v.calcularTotalGasto())
+                };
+                modeloTabela.addRow(row);
+            }
+        }
+    }
+
+    private void filtrarPorMarca(String marca) {
+        modeloTabela.setRowCount(0);
+
+        for (Veiculo v : Servicos.listarVeiculos()) {
+            if (v.getMarca().equalsIgnoreCase(marca)) {
+                String infoExtra = (v instanceof CarroLigeiro) ?
+                        ((CarroLigeiro) v).getNumPortas() + " Portas" :
+                        ((Motociclo) v).getCilindrada() + "cc";
+
+                Object[] row = {
+                        v.getClass().getSimpleName(),
+                        v.getMatricula(),
+                        v.getDono(),
+                        v.getMarca() + " " + v.getModelo(),
+                        infoExtra,
+                        String.format("%.2f€", v.calcularTotalGasto())
+                };
+                modeloTabela.addRow(row);
+            }
         }
     }
 }
