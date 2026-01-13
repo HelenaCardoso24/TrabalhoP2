@@ -1,6 +1,10 @@
 import javax.swing.SwingUtilities;
 
 public class App {
+
+    //TODO: apagar antes de entregar ao stor
+    final static boolean DEBUG = true;
+
     public static void main(String[] args) {
         // 1. CARREGAR DADOS DO FICHEIRO (Obrigatório para nota 16-20)
         // Tenta carregar os dados guardados em "oficina_dados.csv"
@@ -8,7 +12,7 @@ public class App {
 
         // 2. VERIFICAÇÃO DE DADOS INICIAIS
         // Se a lista estiver vazia (primeira vez que corre), cria dados de exemplo
-        if (Servicos.listarVeiculos().isEmpty()) {
+        if (Servicos.listarVeiculos().isEmpty() && DEBUG) {
             System.out.println("Nenhum dado encontrado. Criando veículos de teste...");
 
             // Exemplo de Polimorfismo: Criar um Carro e um Motociclo

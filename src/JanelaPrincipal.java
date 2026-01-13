@@ -4,6 +4,10 @@ import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.List;
+import java.util.Calendar;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
+
 
 public class JanelaPrincipal extends JFrame {
     private JTable tabelaVeiculos;
@@ -16,9 +20,12 @@ public class JanelaPrincipal extends JFrame {
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
+        Color rosaFundo = new Color(255, 182, 193); // Rosa claro
+        Color rosaForte = new Color(255, 105, 180); // Hot Pink
+
         // --- PAINEL SUPERIOR ---
         JPanel painelTitulo = new JPanel();
-        painelTitulo.setBackground(new Color(30, 30, 30));
+        painelTitulo.setBackground(rosaForte);
         JLabel lblTitulo = new JLabel("Sistema de Faturação e Relatórios", SwingConstants.CENTER);
         lblTitulo.setForeground(Color.WHITE);
         lblTitulo.setFont(new Font("Arial", Font.BOLD, 22));
@@ -33,36 +40,63 @@ public class JanelaPrincipal extends JFrame {
         };
 
         tabelaVeiculos = new JTable(modeloTabela);
-        add(new JScrollPane(tabelaVeiculos), BorderLayout.CENTER);
+        tabelaVeiculos.setBackground(new Color(255, 240, 245)); // Rosa "Lavender Blush" para as linhas
+        tabelaVeiculos.setSelectionBackground(rosaForte); // Cor quando selecionas uma linha
+        tabelaVeiculos.getTableHeader().setBackground(rosaForte); // Cabeçalho rosa
+        tabelaVeiculos.getTableHeader().setForeground(Color.WHITE);
+    
+        JScrollPane scrollPane = new JScrollPane(tabelaVeiculos);
+        scrollPane.getViewport().setBackground(rosaFundo); // Fundo da área vazia da tabela
+        add(scrollPane, BorderLayout.CENTER);
 
         // --- PAINEL LATERAL ---
         JPanel painelBotoes = new JPanel(new GridLayout(6, 1, 10, 10));
+
+
+        painelBotoes.setBackground(rosaFundo); 
         painelBotoes.setBorder(BorderFactory.createEmptyBorder(20, 10, 20, 10));
 
+        // Inicialização dos botões
         JButton btnNovo = new JButton("Novo Veículo");
         JButton btnAddServico = new JButton("Registar Serviço");
         JButton btnRelatorio = new JButton("Fatura / Relatório");
         JButton btnRemover = new JButton("Remover Veículo");
         JButton btnSair = new JButton("Sair");
 
+        // --- ESTILIZAÇÃO DOS BOTÕES ---
+        JButton[] todosBotoes = {btnNovo, btnAddServico, btnRelatorio, btnRemover, btnSair};
+        for (JButton btn : todosBotoes) {
+            btn.setBackground(Color.WHITE);      // Fundo do botão branco
+            btn.setForeground(rosaForte);       // Texto em rosa forte
+            btn.setFocusPainted(false);          // Retira aquele quadrado de seleção feio
+            btn.setFont(new Font("Arial", Font.BOLD, 13));
+            btn.setBorder(BorderFactory.createLineBorder(rosaForte, 2)); // Borda rosa
+        }
+
+        // --- AÇÕES (Mantêm-se iguais) ---
         btnNovo.addActionListener(e -> abrirFormularioNovoVeiculo());
         btnRelatorio.addActionListener(e -> verRelatorio());
         btnAddServico.addActionListener(e -> adicionarServico());
         btnRemover.addActionListener(e -> removerVeiculo());
         btnSair.addActionListener(e -> {
-            Servicos.guardarDados(); // Garante a escrita no ficheiro antes de fechar
+            Servicos.guardarDados();
             System.exit(0);
         });
 
+        // Adicionar ao painel
         painelBotoes.add(btnNovo);
         painelBotoes.add(btnAddServico);
         painelBotoes.add(btnRelatorio);
         painelBotoes.add(btnRemover);
-        painelBotoes.add(new JSeparator());
+        
+        // Separador invisível ou rosa
+        JSeparator sep = new JSeparator();
+        sep.setForeground(rosaFundo); 
+        painelBotoes.add(sep);
+        
         painelBotoes.add(btnSair);
 
         add(painelBotoes, BorderLayout.EAST);
-        atualizarTabela();
     }
 
     private void abrirFormularioNovoVeiculo() {
@@ -97,7 +131,7 @@ public class JanelaPrincipal extends JFrame {
 
         Object[] form = {
                 "Tipo:", comboTipo,
-                "Matrícula (AA00AA):", txtMatricula,
+                "Matrícula (AA-00-AA):", txtMatricula,
                 "Dono:", txtDono,
                 "Marca:", txtMarca,
                 "Modelo:", txtModelo,
@@ -109,21 +143,43 @@ public class JanelaPrincipal extends JFrame {
         int res = JOptionPane.showConfirmDialog(this, form, "Novo Registo", JOptionPane.OK_CANCEL_OPTION);
         if (res == JOptionPane.OK_OPTION) {
             try {
+                String matricula = txtMatricula.getText();
+                String regex = "^(?!([A-Z]{2}-){2}[A-Z]{2}$)" + "(?!([0-9]{2}-){2}[0-9]{2}$)" + "([A-Z]{2}|[0-9]{2})-([A-Z]{2}|[0-9]{2})-([A-Z]{2}|[0-9]{2})$";
+                Matcher matcher =  Pattern.compile(regex).matcher(matricula);
+
+                if(!matcher.matches()){
+                    JOptionPane.showMessageDialog(this, "Dados inválidos!\nEste formato de matrícula não é válido");
+                    return;
+                }
+
+                int ano_atual = Calendar.getInstance().get(Calendar.YEAR);
+                String anoAtual = String.valueOf(ano_atual);
+
                 int ano = Integer.parseInt(txtAno.getText());
+                if(ano < 1920 || ano > ano_atual){
+                    JOptionPane.showMessageDialog(this, "Dados inválidos!\nAno tem que estar entre 1920 e " + anoAtual);
+                    return;
+                }
+                
                 int km = Integer.parseInt(txtKM.getText());
+                if(km < 0){
+                    JOptionPane.showMessageDialog(this, "Dados de quilometros inválidos!\n");
+                    return;
+                }
+
                 int extra = Integer.parseInt(txtExtra.getText());
 
                 Veiculo v;
                 if (comboTipo.getSelectedIndex() == 0) {
-                    v = new CarroLigeiro(txtMatricula.getText(), txtDono.getText(), txtMarca.getText(), txtModelo.getText(), ano, km, extra);
+                    v = new CarroLigeiro(matricula, txtDono.getText(), txtMarca.getText(), txtModelo.getText(), ano, km, extra);
                 } else {
-                    v = new Motociclo(txtMatricula.getText(), txtDono.getText(), txtMarca.getText(), txtModelo.getText(), ano, km, extra);
+                    v = new Motociclo(matricula, txtDono.getText(), txtMarca.getText(), txtModelo.getText(), ano, km, extra);
                 }
 
                 Servicos.registarVeiculo(v);
                 atualizarTabela();
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Dados inválidos!");
+                JOptionPane.showMessageDialog(this, "Dados inválidos!\n" + ex.getMessage());
             }
         }
     }
