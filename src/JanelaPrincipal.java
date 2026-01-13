@@ -123,6 +123,29 @@ public class JanelaPrincipal extends JFrame {
         });
 
         JTextField txtDono = new JTextField();
+        txtDono.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                String val = txtDono.getText().toLowerCase();
+                StringBuilder sb = new StringBuilder();
+                boolean capitalize = true;
+
+                for (int i = 0; i < val.length(); i++) {
+                    char c = val.charAt(i);
+                    if (capitalize && Character.isLetter(c)) {
+                        sb.append(Character.toUpperCase(c));
+                        capitalize = false;
+                    } else {
+                        sb.append(c);
+                    }
+                    if (c == ' ') capitalize = true;
+                }
+
+                txtDono.setText(sb.toString());
+                txtDono.setCaretPosition(txtDono.getText().length());
+            }
+        });
+
         JTextField txtMarca = new JTextField();
         JTextField txtModelo = new JTextField();
         JTextField txtAno = new JTextField();
@@ -254,7 +277,7 @@ public class JanelaPrincipal extends JFrame {
     }
 
     private void abrirPesquisa() {
-        String[] opcoes = {"Por Matrícula", "Por Dono", "Por Marca"};
+        String[] opcoes = {"Por Matrícula", "Por Dono", "Por Marca", "Nenhum"};
 
         String filtro = (String) JOptionPane.showInputDialog(
                 this,
@@ -344,6 +367,11 @@ public class JanelaPrincipal extends JFrame {
             case "Por Marca":
                 String marca = JOptionPane.showInputDialog("Marca:");
                 if (marca != null) filtrarPorMarca(marca);
+                break;
+
+            case "Nenhum":
+                atualizarTabela();
+                JOptionPane.showMessageDialog(this, "Filtro removido. Mostrando todos os veículos.");
                 break;
         }
     }
