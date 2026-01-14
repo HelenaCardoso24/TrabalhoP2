@@ -25,7 +25,9 @@ public class App {
             // Adicionar serviços iniciais usando a Sobrecarga de Métodos
             Servicos.realizarServico(c1, "Troca de óleo");
             Servicos.realizarServico(m1, "Revisão Geral", 120.0); // Exemplo de preço manual
+
         }
+
 
         // 3. LANÇAR A INTERFACE GRÁFICA (Swing)
         SwingUtilities.invokeLater(() -> {

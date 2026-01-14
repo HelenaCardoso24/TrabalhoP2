@@ -102,6 +102,7 @@ public class JanelaPrincipal extends JFrame {
         painelBotoes.add(btnSair);
 
         add(painelBotoes, BorderLayout.EAST);
+        atualizarTabela();
     }
 
     private void abrirFormularioNovoVeiculo() {
