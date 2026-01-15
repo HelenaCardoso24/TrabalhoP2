@@ -124,11 +124,8 @@ public class JanelaPrincipal extends JFrame {
         JTextField txtAno = new JTextField();
         JTextField txtKM = new JTextField();
         JTextField txtExtra = new JTextField(); // Portas ou Cilindrada
-        JLabel lblExtra = new JLabel("Nº Portas:");
+        JTextField txtNumPort = new JTextField(); // Portas ou Cilindrada
 
-        comboTipo.addActionListener(e -> {
-            lblExtra.setText(comboTipo.getSelectedIndex() == 0 ? "Nº Portas:" : "Cilindrada:");
-        });
 
         Object[] form = {
                 "Tipo:", comboTipo,
@@ -138,7 +135,8 @@ public class JanelaPrincipal extends JFrame {
                 "Modelo:", txtModelo,
                 "Ano:", txtAno,
                 "KM:", txtKM,
-                lblExtra, txtExtra
+                "Número de Portas:", txtNumPort,
+                txtExtra
         };
 
         int res = JOptionPane.showConfirmDialog(this, form, "Novo Registo", JOptionPane.OK_CANCEL_OPTION);
@@ -176,6 +174,12 @@ public class JanelaPrincipal extends JFrame {
                 } else {
                     v = new Motociclo(matricula, txtDono.getText(), txtMarca.getText(), txtModelo.getText(), ano, km, extra);
                 }
+
+                // Setter com Validação Real 
+                int numPortas = Integer.parseInt(txtNumPort.getText());
+                    if (numPortas >= 2 && numPortas <= 5) {
+                        JOptionPane.showMessageDialog(this, "Erro: Número de portas inválido para um carro ligeiro!");
+                        }
 
                 Servicos.registarVeiculo(v);
                 atualizarTabela();
