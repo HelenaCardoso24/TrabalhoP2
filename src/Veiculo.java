@@ -20,7 +20,6 @@ public abstract class Veiculo { // abstract porque não existe um "veiculo" gen�
         this.historico = new ArrayList<>();
     }
 
-    // Métodos comuns
     public void adicionarServico(ServicoRealizado s) { this.historico.add(s); }
 
     public double calcularTotalGasto() {
