@@ -2,8 +2,7 @@ import javax.swing.SwingUtilities;
 
 public class App {
 
-    //TODO: apagar antes de entregar ao stor
-    final static boolean DEBUG = true; // nao bastaria meter false em vez de apagar (ivo)
+    final static boolean DEBUG = false; // nao bastaria meter false em vez de apagar (ivo)
 
     public static void main(String[] args) {
         // Tenta carregar os dados guardados em "oficina_dados.csv"
