@@ -278,7 +278,7 @@ public class JanelaPrincipal extends JFrame {
         Veiculo v = Servicos.listarVeiculos().stream().filter(x -> x.getMatricula().equals(mat)).findFirst().orElse(null);
 
         List<String> opcoes = Servicos.listarNomesServicos();
-        String s = (String) JOptionPane.showInputDialog(this, "Serviço:", "Oficina", 0, null, opcoes.toArray(), opcoes.get(0));
+        String s = (String) JOptionPane.showInputDialog(this, "Serviço:", "Oficina", 0, null, opcoes.toArray(), opcoes.getFirst());
 
         if (s != null) {
             Servicos.realizarServico(v, s);
