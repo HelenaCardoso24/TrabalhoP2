@@ -23,7 +23,7 @@ public class JanelaPrincipal extends JFrame {
         Color rosaFundo = new Color(255, 182, 193); // Rosa claro
         Color rosaForte = new Color(255, 105, 180); // Hot Pink
 
-        // --- PAINEL SUPERIOR ---
+        // painel superior
         JPanel painelTitulo = new JPanel();
         painelTitulo.setBackground(rosaForte);
         JLabel lblTitulo = new JLabel("Sistema de Faturação e Relatórios", SwingConstants.CENTER);
@@ -32,7 +32,7 @@ public class JanelaPrincipal extends JFrame {
         painelTitulo.add(lblTitulo);
         add(painelTitulo, BorderLayout.NORTH);
 
-        // --- TABELA (Polimorfismo: mostra todos os Veiculos) ---
+        // tabela onde tem todos os veículos
         String[] colunas = {"Tipo", "Matrícula", "Dono", "Marca/Modelo", "Info Extra", "Total Gasto"};
         modeloTabela = new DefaultTableModel(colunas, 0) {
             @Override
@@ -51,14 +51,14 @@ public class JanelaPrincipal extends JFrame {
         scrollPane.getViewport().setBackground(rosaFundo); // Fundo da área vazia da tabela
         add(scrollPane, BorderLayout.CENTER);
 
-        // --- PAINEL LATERAL ---
+        // painel lateral
         JPanel painelBotoes = new JPanel(new GridLayout(7, 1, 10, 10));
 
 
         painelBotoes.setBackground(rosaFundo);
         painelBotoes.setBorder(BorderFactory.createEmptyBorder(20, 10, 20, 10));
 
-        // Inicialização dos botões
+        // inicialização dos botoes
         JButton btnNovo = new JButton("Novo Veículo");
         JButton btnAddServico = new JButton("Registar Serviço");
         JButton btnRelatorio = new JButton("Fatura / Relatório");
@@ -66,7 +66,7 @@ public class JanelaPrincipal extends JFrame {
         JButton btnRemover = new JButton("Remover Veículo");
         JButton btnSair = new JButton("Sair");
 
-        // --- ESTILIZAÇÃO DOS BOTÕES ---
+        // estilo dos botões
         JButton[] todosBotoes = {btnNovo, btnAddServico, btnRelatorio,btnPesquisa, btnRemover, btnSair};
         for (JButton btn : todosBotoes) {
             btn.setBackground(Color.WHITE);      // Fundo do botão branco
@@ -76,7 +76,7 @@ public class JanelaPrincipal extends JFrame {
             btn.setBorder(BorderFactory.createLineBorder(rosaForte, 2)); // Borda rosa
         }
 
-        // --- AÇÕES (Mantêm-se iguais) ---
+        // ações
         btnNovo.addActionListener(e -> abrirFormularioNovoVeiculo());
         btnRelatorio.addActionListener(e -> verRelatorio());
         btnAddServico.addActionListener(e -> adicionarServico());
@@ -87,7 +87,7 @@ public class JanelaPrincipal extends JFrame {
             System.exit(0);
         });
 
-        // Adicionar ao painel
+        // adiciona ao painel
         painelBotoes.add(btnNovo);
         painelBotoes.add(btnAddServico);
         painelBotoes.add(btnRelatorio);
@@ -110,7 +110,7 @@ public class JanelaPrincipal extends JFrame {
         JComboBox<String> comboTipo = new JComboBox<>(tipos);
 
         JTextField txtMatricula = new JTextField();
-        // Formatação automática da matrícula que pediste
+        // Formatação automática da matrícula
         txtMatricula.addKeyListener(new KeyAdapter() {
             public void keyReleased(KeyEvent e) {
                 String val = txtMatricula.getText().replace("-", "").toUpperCase();
@@ -151,9 +151,16 @@ public class JanelaPrincipal extends JFrame {
         JTextField txtModelo = new JTextField();
         JTextField txtAno = new JTextField();
         JTextField txtKM = new JTextField();
-        JTextField txtExtra = new JTextField(); // Portas ou Cilindrada
-        JTextField txtNumPort = new JTextField(); // Portas ou Cilindrada
+        JTextField txtExtra = new JTextField();
+        JLabel lblExtra = new JLabel("Número de Portas:");
 
+        comboTipo.addActionListener(e -> {
+            if (comboTipo.getSelectedIndex() == 0) {
+                lblExtra.setText("Número de Portas (2–5):");
+            } else {
+                lblExtra.setText("Cilindrada (cc):");
+            }
+        });
 
         Object[] form = {
                 "Tipo:", comboTipo,
@@ -163,15 +170,14 @@ public class JanelaPrincipal extends JFrame {
                 "Modelo:", txtModelo,
                 "Ano:", txtAno,
                 "KM:", txtKM,
-                "Número de Portas:", txtNumPort,
-                txtExtra
+                lblExtra, txtExtra
         };
 
         int res = JOptionPane.showConfirmDialog(this, form, "Novo Registo", JOptionPane.OK_CANCEL_OPTION);
         if (res == JOptionPane.OK_OPTION) {
             try {
                 String matricula = txtMatricula.getText();
-                String regex = "^(?!([A-Z]{2}-){2}[A-Z]{2}$)" + "(?!([0-9]{2}-){2}[0-9]{2}$)" + "([A-Z]{2}|[0-9]{2})-([A-Z]{2}|[0-9]{2})-([A-Z]{2}|[0-9]{2})$";
+                String regex = "^([A-Z0-9]{2}-){2}[A-Z0-9]{2}$";
                 Matcher matcher = Pattern.compile(regex).matcher(matricula);
 
                 if (!matcher.matches()) {
@@ -194,20 +200,29 @@ public class JanelaPrincipal extends JFrame {
                     return;
                 }
 
-                int extra = Integer.parseInt(txtExtra.getText());
-
                 Veiculo v;
+
                 if (comboTipo.getSelectedIndex() == 0) {
-                    v = new CarroLigeiro(matricula, txtDono.getText(), txtMarca.getText(), txtModelo.getText(), ano, km, extra);
+                    int portas = Integer.parseInt(txtExtra.getText());
+                    if (portas < 2 || portas > 5) {
+                        JOptionPane.showMessageDialog(this, "Número de portas deve estar entre 2 e 5!");
+                        return;
+                    }
+
+                    v = new CarroLigeiro(matricula, txtDono.getText(), txtMarca.getText(),
+                            txtModelo.getText(), ano, km, portas);
+
                 } else {
-                    v = new Motociclo(matricula, txtDono.getText(), txtMarca.getText(), txtModelo.getText(), ano, km, extra);
+                    int cilindrada = Integer.parseInt(txtExtra.getText());
+                    if (cilindrada < 50 || cilindrada > 2500) {
+                        JOptionPane.showMessageDialog(this, "Cilindrada deve estar entre 50 e 2500 cc!");
+                        return;
+                    }
+
+                    v = new Motociclo(matricula, txtDono.getText(), txtMarca.getText(),
+                            txtModelo.getText(), ano, km, cilindrada);
                 }
 
-                // Setter com Validação Real 
-                int numPortas = Integer.parseInt(txtNumPort.getText());
-                    if (numPortas >= 2 && numPortas <= 5) {
-                        JOptionPane.showMessageDialog(this, "Erro: Número de portas inválido para um carro ligeiro!");
-                        }
 
                 Servicos.registarVeiculo(v);
                 atualizarTabela();
@@ -395,7 +410,7 @@ public class JanelaPrincipal extends JFrame {
             }
             String matriculaFormatada = sb.toString();
 
-            String regex = "^(?!([A-Z]{2}-){2}[A-Z]{2}$)(?!([0-9]{2}-){2}[0-9]{2}$)([A-Z]{2}|[0-9]{2})-([A-Z]{2}|[0-9]{2})-([A-Z]{2}|[0-9]{2})$";
+            String regex = "^([A-Z0-9]{2}-){2}[A-Z0-9]{2}$";
             Matcher matcher = Pattern.compile(regex).matcher(matriculaFormatada);
             if (!matcher.matches()) {
                 JOptionPane.showMessageDialog(this, "Matrícula inválida! Use formato AA-00-AA ou 00-AA-00");

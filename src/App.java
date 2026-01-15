@@ -3,19 +3,17 @@ import javax.swing.SwingUtilities;
 public class App {
 
     //TODO: apagar antes de entregar ao stor
-    final static boolean DEBUG = true;
+    final static boolean DEBUG = true; // nao bastaria meter false em vez de apagar (ivo)
 
     public static void main(String[] args) {
-        // 1. CARREGAR DADOS DO FICHEIRO (Obrigatório para nota 16-20)
         // Tenta carregar os dados guardados em "oficina_dados.csv"
         Servicos.carregarDados();
 
-        // 2. VERIFICAÇÃO DE DADOS INICIAIS
         // Se a lista estiver vazia (primeira vez que corre), cria dados de exemplo
         if (Servicos.listarVeiculos().isEmpty() && DEBUG) {
             System.out.println("Nenhum dado encontrado. Criando veículos de teste...");
 
-            // Exemplo de Polimorfismo: Criar um Carro e um Motociclo
+            // Exemplo de criar um Carro e um Motociclo
             CarroLigeiro c1 = new CarroLigeiro("AA-11-BB", "Helena Cardoso", "VW", "Golf", 2022, 15000, 5);
             Motociclo m1 = new Motociclo("99-ZZ-11", "Ricardo Jorge", "Yamaha", "MT-07", 2021, 5000, 689);
 
@@ -29,7 +27,7 @@ public class App {
         }
 
 
-        // 3. LANÇAR A INTERFACE GRÁFICA (Swing)
+        // LANÇAR A INTERFACE GRÁFICA (Swing)
         SwingUtilities.invokeLater(() -> {
             try {
                 // Define o aspeto visual do sistema operativo (opcional, mas fica mais bonito)
